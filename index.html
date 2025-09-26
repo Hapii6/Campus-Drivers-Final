@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Drivers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito Sans', sans-serif;
+            background: linear-gradient(to top, #272c34, #545a66);
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 414px; /* iPhone 16 Pro width */
+            height: 100vh;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .active {
+            display: flex;
+        }
+        .logo {
+            width: 200px;
+            margin-bottom: 20px;
+        }
+        .loading {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f6d9ea;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        video {
+            width: 100%;
+            max-width: 414px;
+        }
+        button {
+            background: #f6d9ea;
+            color: #272c34;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 80%;
+            text-align: center;
+        }
+        .admin-btn {
+            position: absolute;
+            bottom: 20px;
+            width: auto;
+        }
+        .driver-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .driver-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px 0;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+        .driver-card img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .stars {
+            display: flex;
+            margin: 5px 0;
+        }
+        .star {
+            font-size: 24px;
+            color: #ccc;
+            cursor: pointer;
+        }
+        .star.filled {
+            color: #ffd700;
+        }
+        .like-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #ccc;
+            cursor: pointer;
+        }
+        .like-btn.liked {
+            color: #ff0000;
+        }
+        .availability {
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+        .available {
+            background: green;
+        }
+        .unavailable {
+            background: red;
+        }
+        .profile {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .profile img {
+            width: 150px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        .comments {
+            width: 90%;
+            margin: 20px 0;
+        }
+        .comment-input {
+            width: 100%;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: #fff;
+            padding: 10px;
+            box-sizing: border-box;
+            border-radius: 10px;
+        }
+        .comment-list {
+            margin-top: 10px;
+        }
+        .comment {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 5px 0;
+        }
+        .booking-page {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .map-img {
+            width: 100%;
+            margin: 20px 0;
+        }
+        .login {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: #fff;
+            border-radius: 10px;
+        }
+        .admin-profile {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .history {
+            width: 90%;
+            margin: 20px 0;
+        }
+        .history-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 5px 0;
+        }
+        .planning {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #272c34;
+            padding: 20px;
+            border-radius: 15px;
+        }
+        .day {
+            width: 90%;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .event {
+            background: #f6d9ea;
+            color: #272c34;
+            padding: 5px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Screen 1: Splash Loading -->
+    <div id="screen1" class="screen active">
+        <img src="logo.png" alt="Campus Drivers Logo" class="logo">
+        <div class="loading">Installation...</div>
+    </div>
+
+    <!-- Screen 2: Video Animation -->
+    <div id="screen2" class="screen">
+        <video src="animation_logo.mp4" autoplay onended="showScreen('screen3')"></video>
+    </div>
+
+    <!-- Screen 3: Main Menu -->
+    <div id="screen3" class="screen">
+        <button onclick="showScreen('screen4')">Book your driver</button>
+        <button class="admin-btn" onclick="showScreen('admin-login')">Admin</button>
+    </div>
+
+    <!-- Screen 4: Driver List -->
+    <div id="screen4" class="screen">
+        <div class="driver-list">
+            <div class="driver-card" onclick="showDriverProfile('lane')">
+                <img src="camaro.jpg" alt="Chevrolet Camaro">
+                <h3>Lane O'Neill - Chevrolet Camaro Cabriolet Pack SS V8 1967</h3>
+                <div class="stars" data-driver="lane"></div>
+                <button class="like-btn" data-driver="lane">❤️</button>
+                <p>Rides: 150</p>
+                <div class="availability available" data-driver="lane" onclick="toggleAvailability(this)">Available</div>
+            </div>
+            <div class="driver-card" onclick="showDriverProfile('donovan')">
+                <img src="oldsmobile.jpg" alt="Oldsmobile 442">
+                <h3>Donovan Wentworth - Oldsmobile 442 1970</h3>
+                <div class="stars" data-driver="donovan"></div>
+                <button class="like-btn" data-driver="donovan">❤️</button>
+                <p>Rides: 120</p>
+                <div class="availability available" data-driver="donovan" onclick="toggleAvailability(this)">Available</div>
+            </div>
+            <div class="driver-card" onclick="showDriverProfile('lewis')">
+                <img src="mustang.jpg" alt="Ford Mustang">
+                <h3>Lewis Prescott - Ford Mustang Convertible 1964</h3>
+                <div class="stars" data-driver="lewis"></div>
+                <button class="like-btn" data-driver="lewis">❤️</button>
+                <p>Rides: 180</p>
+                <div class="availability available" data-driver="lewis" onclick="toggleAvailability(this)">Available</div>
+            </div>
+            <div class="driver-card" onclick="showDriverProfile('adam')">
+                <img src="lemans.jpg" alt="Pontiac LeMans">
+                <h3>Adam Kingsley - Pontiac LeMans 1968</h3>
+                <div class="stars" data-driver="adam"></div>
+                <button class="like-btn" data-driver="adam">❤️</button>
+                <p>Rides: 140</p>
+                <div class="availability available" data-driver="adam" onclick="toggleAvailability(this)">Available</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Driver Profiles -->
+    <div id="profile-lane" class="screen profile">
+        <img src="lane-photo.jpg" alt="Lane O'Neill">
+        <img src="camaro.jpg" alt="Chevrolet Camaro">
+        <p>Engine: V8 6.5L, 375 HP</p>
+        <p>Rides: 150</p>
+        <p>Rating: 4.7/5</p>
+        <p>Kilometers: 12,500</p>
+        <div class="comments">
+            <textarea class="comment-input" placeholder="Leave a comment"></textarea>
+            <button onclick="addComment('lane')">Submit</button>
+            <div class="comment-list"></div>
+        </div>
+        <button onclick="showScreen('booking-lane')">Book Driver</button>
+    </div>
+    <div id="profile-donovan" class="screen profile">
+        <img src="donovan-photo.jpg" alt="Donovan Wentworth">
+        <img src="oldsmobile.jpg" alt="Oldsmobile 442">
+        <p>Engine: V8 7.5L, 365 HP</p>
+        <p>Rides: 120</p>
+        <p>Rating: 4.6/5</p>
+        <p>Kilometers: 10,200</p>
+        <div class="comments">
+            <textarea class="comment-input" placeholder="Leave a comment"></textarea>
+            <button onclick="addComment('donovan')">Submit</button>
+            <div class="comment-list"></div>
+        </div>
+        <button onclick="showScreen('booking-donovan')">Book Driver</button>
+    </div>
+    <div id="profile-lewis" class="screen profile">
+        <img src="lewis-photo.jpg" alt="Lewis Prescott">
+        <img src="mustang.jpg" alt="Ford Mustang">
+        <p>Engine: V8 4.7L, 271 HP</p>
+        <p>Rides: 180</p>
+        <p>Rating: 4.8/5</p>
+        <p>Kilometers: 15,000</p>
+        <div class="comments">
+            <textarea class="comment-input" placeholder="Leave a comment"></textarea>
+            <button onclick="addComment('lewis')">Submit</button>
+            <div class="comment-list">
+                <div class="comment">He gave me 2 stars? 'The driver talks too much.'?</div>
+            </div>
+        </div>
+        <button onclick="showScreen('booking-lewis')">Book Driver</button>
+    </div>
+    <div id="profile-adam" class="screen profile">
+        <img src="adam-photo.jpg" alt="Adam Kingsley">
+        <img src="lemans.jpg" alt="Pontiac LeMans">
+        <p>Engine: V8 5.7L, 325 HP</p>
+        <p>Rides: 140</p>
+        <p>Rating: 4.5/5</p>
+        <p>Kilometers: 11,800</p>
+        <div class="comments">
+            <textarea class="comment-input" placeholder="Leave a comment"></textarea>
+            <button onclick="addComment('adam')">Submit</button>
+            <div class="comment-list"></div>
+        </div>
+        <button onclick="showScreen('booking-adam')">Book Driver</button>
+    </div>
+
+    <!-- Booking Pages -->
+    <div id="booking-lane" class="screen booking-page">
+        <h2>Booking Lane O'Neill</h2>
+        <p>Pickup: Current Location</p>
+        <p>Destination: Enter Address</p>
+        <img src="map.png" alt="Navigation Map" class="map-img">
+        <button onclick="showScreen('screen3')">Confirm (Simulated)</button>
+    </div>
+    <div id="booking-donovan" class="screen booking-page">
+        <h2>Booking Donovan Wentworth</h2>
+        <p>Pickup: Current Location</p>
+        <p>Destination: Enter Address</p>
+        <img src="map.png" alt="Navigation Map" class="map-img">
+        <button onclick="showScreen('screen3')">Confirm (Simulated)</button>
+    </div>
+    <div id="booking-lewis" class="screen booking-page">
+        <h2>Booking Lewis Prescott</h2>
+        <p>Pickup: Current Location</p>
+        <p>Destination: Enter Address</p>
+        <img src="map.png" alt="Navigation Map" class="map-img">
+        <button onclick="showScreen('screen3')">Confirm (Simulated)</button>
+    </div>
+    <div id="booking-adam" class="screen booking-page">
+        <h2>Booking Adam Kingsley</h2>
+        <p>Pickup: Current Location</p>
+        <p>Destination: Enter Address</p>
+        <img src="map.png" alt="Navigation Map" class="map-img">
+        <button onclick="showScreen('screen3')">Confirm (Simulated)</button>
+    </div>
+
+    <!-- Admin Login -->
+    <div id="admin-login" class="screen login">
+        <input type="text" id="username" placeholder="Username (First Name)">
+        <input type="password" id="password" placeholder="Password (Last Name)">
+        <button onclick="adminLogin()">Enter Driver Profile</button>
+    </div>
+
+    <!-- Admin Profiles -->
+    <div id="admin-lane" class="screen admin-profile">
+        <img src="lane-photo.jpg" alt="Lane O'Neill">
+        <p>Car: Chevrolet Camaro Cabriolet Pack SS V8 1967</p>
+        <p>Salary Week: $500</p>
+        <p>Month: $2000</p>
+        <p>Year: $24000</p>
+        <div class="history">
+            <h3>Ride History</h3>
+            <div class="history-item">Client: John Doe - 5★ - Great ride!</div>
+            <div class="history-item">Client: Jane Smith - 4★ - Smooth drive.</div>
+        </div>
+        <button onclick="showScreen('planning-lane')">Planning</button>
+    </div>
+    <div id="admin-donovan" class="screen admin-profile">
+        <img src="donovan-photo.jpg" alt="Donovan Wentworth">
+        <p>Car: Oldsmobile 442 1970</p>
+        <p>Salary Week: $450</p>
+        <p>Month: $1800</p>
+        <p>Year: $21600</p>
+        <div class="history">
+            <h3>Ride History</h3>
+            <div class="history-item">Client: Alice - 4.5★ - Enjoyed the classic car.</div>
+        </div>
+        <button onclick="showScreen('planning-donovan')">Planning</button>
+    </div>
+    <div id="admin-lewis" class="screen admin-profile">
+        <img src="lewis-photo.jpg" alt="Lewis Prescott">
+        <p>Car: Ford Mustang Convertible 1964</p>
+        <p>Salary Week: $550</p>
+        <p>Month: $2200</p>
+        <p>Year: $26400</p>
+        <div class="history">
+            <h3>Ride History</h3>
+            <div class="history-item">Client: Bob - 2★ - The driver talks too much.</div>
+        </div>
+        <button onclick="showScreen('planning-lewis')">Planning</button>
+    </div>
+    <div id="admin-adam" class="screen admin-profile">
+        <img src="adam-photo.jpg" alt="Adam Kingsley">
+        <p>Car: Pontiac LeMans 1968</p>
+        <p>Salary Week: $480</p>
+        <p>Month: $1920</p>
+        <p>Year: $23040</p>
+        <div class="history">
+            <h3>Ride History</h3>
+            <div class="history-item">Client: Eve - 5★ - Perfect!</div>
+        </div>
+        <button onclick="showScreen('planning-adam')">Planning</button>
+    </div>
+
+    <!-- Planning Pages -->
+    <div id="planning-lane" class="screen planning">
+        <h2>Weekly Planning</h2>
+        <div class="day">
+            <h3>Monday</h3>
+            <div class="event">9AM - John Doe</div>
+        </div>
+        <div class="day">
+            <h3>Tuesday</h3>
+            <div class="event">2PM - Jane Smith</div>
+        </div>
+        <!-- Add more days as needed -->
+        <button onclick="showScreen('admin-lane')">Back</button>
+    </div>
+    <div id="planning-donovan" class="screen planning">
+        <h2>Weekly Planning</h2>
+        <div class="day">
+            <h3>Monday</h3>
+            <div class="event">10AM - Alice</div>
+        </div>
+        <!-- Add more -->
+        <button onclick="showScreen('admin-donovan')">Back</button>
+    </div>
+    <div id="planning-lewis" class="screen planning">
+        <h2>Weekly Planning</h2>
+        <div class="day">
+            <h3>Wednesday</h3>
+            <div class="event">11AM - Bob</div>
+        </div>
+        <!-- Add more -->
+        <button onclick="showScreen('admin-lewis')">Back</button>
+    </div>
+    <div id="planning-adam" class="screen planning">
+        <h2>Weekly Planning</h2>
+        <div class="day">
+            <h3>Thursday</h3>
+            <div class="event">3PM - Eve</div>
+        </div>
+        <!-- Add more -->
+        <button onclick="showScreen('admin-adam')">Back</button>
+    </div>
+
+    <script>
+        // Show screen function
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // Start with screen 1, timeout to screen 2
+        setTimeout(() => showScreen('screen2'), 6000);
+
+        // Driver profiles
+        function showDriverProfile(driver) {
+            showScreen(`profile-${driver}`);
+            loadComments(driver);
+        }
+
+        // Stars interactive
+        document.querySelectorAll('.stars').forEach(stars => {
+            const driver = stars.dataset.driver;
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('span');
+                star.classList.add('star');
+                star.innerHTML = '★';
+                star.onclick = () => setRating(driver, i);
+                stars.appendChild(star);
+            }
+            loadRating(driver);
+        });
+
+        function setRating(driver, rating) {
+            localStorage.setItem(`rating-${driver}`, rating);
+            loadRating(driver);
+        }
+
+        function loadRating(driver) {
+            const rating = localStorage.getItem(`rating-${driver}`) || 4;
+            const stars = document.querySelector(`.stars[data-driver="${driver}"] .star`);
+            stars.forEach((star, index) => {
+                star.classList.toggle('filled', index < rating);
+            });
+        }
+
+        // Like button
+        document.querySelectorAll('.like-btn').forEach(btn => {
+            const driver = btn.dataset.driver;
+            btn.onclick = (e) => {
+                e.stopPropagation(); // Prevent card click
+                btn.classList.toggle('liked');
+                localStorage.setItem(`like-${driver}`, btn.classList.contains('liked'));
+            };
+            if (localStorage.getItem(`like-${driver}`) === 'true') btn.classList.add('liked');
+        });
+
+        // Availability toggle
+        function toggleAvailability(el) {
+            el.classList.toggle('available');
+            el.classList.toggle('unavailable');
+            el.textContent = el.classList.contains('available') ? 'Available' : 'Unavailable';
+            event.stopPropagation();
+        }
+
+        // Comments
+        function addComment(driver) {
+            const input = document.querySelector(`#profile-${driver} .comment-input`);
+            const list = document.querySelector(`#profile-${driver} .comment-list`);
+            const comment = document.createElement('div');
+            comment.classList.add('comment');
+            comment.textContent = input.value;
+            list.appendChild(comment);
+            saveComment(driver, input.value);
+            input.value = '';
+        }
+
+        function saveComment(driver, comment) {
+            let comments = JSON.parse(localStorage.getItem(`comments-${driver}`)) || [];
+            comments.push(comment);
+            localStorage.setItem(`comments-${driver}`, JSON.stringify(comments));
+        }
+
+        function loadComments(driver) {
+            const list = document.querySelector(`#profile-${driver} .comment-list`);
+            list.innerHTML = ''; // Clear first
+            let comments = JSON.parse(localStorage.getItem(`comments-${driver}`)) || [];
+            comments.forEach(c => {
+                const comment = document.createElement('div');
+                comment.classList.add('comment');
+                comment.textContent = c;
+                list.appendChild(comment);
+            });
+            // For Lewis, ensure the specific comment if not already
+            if (driver === 'lewis' && !comments.includes("He gave me 2 stars? 'The driver talks too much.'?")) {
+                const specComment = "He gave me 2 stars? 'The driver talks too much.'?";
+                saveComment('lewis', specComment);
+                loadComments('lewis');
+            }
+        }
+
+        // Admin Login
+        const drivers = {
+            'Lane': { last: 'O\'Neill', id: 'lane' },
+            'Donovan': { last: 'Wentworth', id: 'donovan' },
+            'Lewis': { last: 'Prescott', id: 'lewis' },
+            'Adam': { last: 'Kingsley', id: 'adam' }
+        };
+
+        function adminLogin() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            if (drivers[user] && drivers[user].last === pass) {
+                showScreen(`admin-${drivers[user].id}`);
+            } else {
+                alert('Invalid credentials');
+            }
+        }
+    </script>
+</body>
+</html>
