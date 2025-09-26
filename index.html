@@ -99,12 +99,7 @@
     .back{background:transparent; border:1px solid var(--stroke); color:var(--text); border-radius:10px; padding:8px 10px; font-weight:700}
 
     /* Video screen */
-    video{display:block}
-
-    /* Fullscreen-like video */
-    .video-stage{padding:0; max-width:none}
-    .fs-video{position:fixed; inset:0; width:100vw; height:100vh; object-fit:cover; border:0; border-radius:0; background:#000}
-    body.video-playing{overflow:hidden}
+    video{width:100%; border-radius:16px; border:1px solid var(--stroke); display:block}
 
     /* Map */
     .map{position:relative; border-radius:16px; overflow:hidden; border:1px solid var(--stroke)}
@@ -131,8 +126,11 @@
     </section>
 
     <!-- Screen 2: intro video -->
-    <section id="s-video" class="screen video-stage">
-      <video id="introVideo" class="fs-video" playsinline muted src="animation-logo.mp4"></video>
+    <section id="s-video" class="screen">
+      <div class="topbar"><button class="back" onclick="go('s-home')">Skip</button><h3>Intro</h3></div>
+      <video id="introVideo" playsinline muted controls src="animation-logo.mp4"></video>
+      <div class="sp12"></div>
+      <button class="btn brand" onclick="go('s-home')">Continue</button>
     </section>
 
     <!-- Screen 3: home (Book/Admin) -->
@@ -287,16 +285,14 @@
       screens.forEach(s=>s.style.display = (s.id===id?'block':'none'));
       // Autoplay the video when entering video screen
       if(id==='s-video'){
-        startIntroVideo();
+        const v=document.getElementById('introVideo');
+        v.currentTime = 0; v.play().catch(()=>{});
       }
     }
 
     // Boot: install -> 6s -> video -> home
     window.addEventListener('load',()=>{
       go('s-install');
-      setTimeout(()=>{ go('s-video'); }, 6000);
-      renderDrivers();
-    });
       setTimeout(()=>{ go('s-video'); }, 6000);
       renderDrivers();
     });
@@ -427,27 +423,6 @@
         }
         root.appendChild(row);
       }
-    }
-
-    // -------- Video helpers --------
-    function startIntroVideo(){
-      const v = byId('introVideo');
-      document.body.classList.add('video-playing');
-      // ensure start from 0 and hide controls
-      v.removeAttribute('controls');
-      v.currentTime = 0;
-      const tryPlay = ()=> v.play().then(()=>{ /* ok */ }).catch(()=>{ showTapOverlay(); });
-      tryPlay();
-      v.onended = ()=>{ document.body.classList.remove('video-playing'); go('s-home'); };
-    }
-    function showTapOverlay(){
-      if(document.getElementById('tapOverlay')) return;
-      const o = document.createElement('div');
-      o.id='tapOverlay';
-      o.style.cssText='position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.6);color:white;font-weight:900;font-size:18px;letter-spacing:.5px;z-index:9;';
-      o.textContent='Tap to start';
-      o.addEventListener('click',()=>{ o.remove(); byId('introVideo').play().catch(()=>{}); });
-      document.body.appendChild(o);
     }
 
     // -------- Utils --------
