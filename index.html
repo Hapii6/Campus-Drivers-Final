@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#f6d9ea">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Campus Drivers</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-  <!-- Leafleta (carte live) -->
+  <!-- Leaflet (carte live) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
     /* ajoute dans <style> */
@@ -467,6 +473,7 @@ else ride.destMarker.setLatLng(destCoords);
     const origin = ride.meMarker ? ride.meMarker.getLatLng() : ride.map.getCenter();
     drawRoute(origin, destCoords);
   }
+
   async function geocode(q){
     try{
       const url = 'https://nominatim.openstreetmap.org/search?format=json&q='+encodeURIComponent(q);
@@ -501,6 +508,33 @@ else ride.routeLine = L.polyline(latlngs, {color:'#f6d9ea', weight:4, opacity:0.
   function byId(id){ return document.getElementById(id); }
   function setText(id,t){ byId(id).textContent=t; }
   function escapeHTML(s){ return (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+  if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .catch(console.error);
+  });
+}
+
+
   </script>
+  <button id="installBtn" class="btn brand" style="display:none;position:fixed;bottom:84px;left:20px;right:20px;max-width:560px;margin:0 auto;">Install App</button>
+<script>
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const btn = document.getElementById('installBtn');
+  btn.style.display = 'block';
+  btn.onclick = async () => {
+    btn.style.display = 'none';
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    console.log('Install choice:', outcome);
+  };
+});
+</script>
+
 </body>
 </html>
