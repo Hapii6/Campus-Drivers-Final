@@ -1,4 +1,4 @@
-const CACHE = 'campus-drivers-v1';
+const CACHE = 'campus-drivers-v2';
 const OFFLINE_URL = '/offline.html';
 const PRECACHE = [
   '/', '/index.html',
@@ -51,3 +51,4 @@ self.addEventListener('fetch', (e) => {
     );
   }
 });
+
