@@ -108,13 +108,13 @@
       background:var(--panel);
       border:1px solid #223;
       border-radius:16px;
-      overflow:auto;               /* scroll horizontal si trop étroit */
+      overflow:auto;
     }
     .planner .header,
     .planner .row{
       display:grid;
       grid-template-columns:80px repeat(7,1fr);
-      min-width:720px;             /* évite l’écrasement des colonnes */
+      min-width:720px;
     }
     .planner .header{
       background:#0e1420;
@@ -124,7 +124,7 @@
     .planner .hcell{font-weight:700; color:var(--muted); text-align:center}
     .time{color:var(--muted); font-size:12px; white-space:nowrap}
     .slot{
-      min-height:56px;             /* lignes un peu plus hautes */
+      min-height:56px;
       border-right:1px solid #223; border-bottom:1px solid #223;
       position:relative; background:#0b0f16
     }
@@ -136,7 +136,7 @@
       border-radius:10px; padding:6px 8px;
       display:flex; flex-direction:column; gap:2px;
       line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-      pointer-events:none;          /* évite la sélection gênante */
+      pointer-events:none;
     }
     .event .t{font-weight:800; font-size:12px}
     .event .s{font-size:11px; color:var(--muted)}
@@ -266,9 +266,9 @@
       <div class="topbar"><button class="back" onclick="go('s-home')">◀ Back</button><h3>Admin login</h3></div>
       <div class="card">
         <div class="field"><label>Username (first name)</label><input id="admUser" class="input" autocomplete="username" placeholder="e.g. Lane"></div>
-        <div class="field"><label>Password (last name)</label><input id="admPass" class="input" type="password" autocomplete="current-password" placeholder="e.g. O'Neill"></div>
+        <div class="field"><label>Password (first name)</label><input id="admPass" class="input" type="password" autocomplete="current-password" placeholder="e.g. Lane"></div>
         <button class="btn brand" onclick="adminLogin()">Enter Driver Profile</button>
-        <p class="muted" style="margin-top:8px">Tip: Lane / O'Neill • Donovan / Wentworth • Lewis / Prescott • Adam / Kingsley</p>
+        <p class="muted" style="margin-top:8px">Tip: Lane / Lane • Donovan / Donovan • Lewis / Lewis • Adam / Adam</p>
       </div>
     </section>
 
@@ -330,7 +330,7 @@
       ]
     },
     {
-      id:'donovan', first:'Donovan', last:'Wentworth', age:21,
+      id:'donovan', first:'Donovan', last:'Wolinski', age:21,
       car:'OLDSMOBILE 442 1970',
       engine:'7.5L V8 • 370 hp • Auto',
       photo:'donovan-photo.jpg',
@@ -342,7 +342,7 @@
       ]
     },
     {
-      id:'lewis', first:'Lewis', last:'Prescott', age:21,
+      id:'lewis', first:'Lewis', last:'Conley', age:21,
       car:'FORD MUSTANG CONVERTIBLE 1964',
       engine:'4.7L V8 • 271 hp • Manual',
       photo:'lewis-photo.jpg',
@@ -354,7 +354,7 @@
       ]
     },
     {
-      id:'adam', first:'Adam', last:'Kingsley', age:21,
+      id:'adam', first:'Adam', last:'Wilson', age:21,
       car:'PONTIAC LEMANS 1968',
       engine:'5.3L V8 • 250 hp • Auto',
       photo:'adam-photo.jpg',
@@ -517,9 +517,8 @@
   // -------- Admin --------
   function adminLogin(){
     const u = byId('admUser').value.trim().toLowerCase();
-    const pRaw = byId('admPass').value.trim().toLowerCase();
-    const norm = s=>s.replace(/[^a-z0-9]/g,'');
-    const d = drivers.find(x=> x.first.toLowerCase()===u && norm(x.last.toLowerCase())===norm(pRaw));
+    const p = byId('admPass').value.trim().toLowerCase();
+    const d = drivers.find(x=> x.first.toLowerCase()===u && x.first.toLowerCase()===p);
     if(!d){ alert('Invalid credentials'); return; }
     adminCtx.current = d; loadAdmin(d); go('s-admin');
   }
@@ -578,7 +577,6 @@
         const slot = document.createElement('div');
         slot.className='slot';
 
-        // une chance raisonnable d’évènement
         if(Math.random()<0.18){
           const e = document.createElement('div');
           e.className='event';
