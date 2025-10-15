@@ -1,98 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#f6d9ea">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Campus Drivers</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-  <!-- Leaaflet (carte live) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
-    /* ajoute dans <style> */
-.leaflet-container { background:#4a5974; }   /* fond entre chargements */
-
-.mapTint{
-  filter: brightness(0.93) contrast(1.05) saturate(1.1);
-}
-
     :root{
-      --bg-top:#545a66; --bg-bottom:#272c34; --brand:#f6d9ea; --text:#e7e9ee; --muted:#aeb5c2;
-      --ok:#19c37d; --no:#ff5a5f; --panel:#141922; --panel-2:#1a1f2a; --star-on:#ffd76a; --star-off:#5a6270;
+      --bg-top:#545a66;
+      --bg-bottom:#272c34;
+      --brand:#f6d9ea;
+      --text:#e7e9ee;
+      --muted:#aeb5c2;
+      --ok:#19c37d;
+      --no:#ff5a5f;
+      --stroke:#404856;
+
+      --panel:#141922;
+      --panel-2:#1a1f2a;
+
+      /* Stars */
+      --star-on:#ffd76a; /* JAUNE */
+      --star-off:#5a6270;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0;font-family:"Nunito Sans",system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif;color:var(--text);
-      background:linear-gradient(180deg,var(--bg-bottom),var(--bg-top));-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-    .app{min-height:100dvh;display:flex;align-items:center;justify-content:center}
-    .screen{width:100%;max-width:560px;margin:auto;padding:20px;display:none}
-    .center{display:flex;align-items:center;justify-content:center;text-align:center}
-    .card{background:var(--panel);border:1px solid #222a36;border-radius:20px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-    .logo{width:min(220px,60vw);height:auto;display:block;margin:0 auto 18px}
-    h1,h2,h3{margin:0 0 8px} p{margin:6px 0 0;color:var(--muted)}
-    .btn.block{ width:100%; display:block }
-    .btn{appearance:none;border:0;border-radius:14px;padding:12px 14px;font-weight:800;letter-spacing:.3px;cursor:pointer;transition:.2s transform ease,.2s filter ease}
-    .btn.brand{background:var(--brand);color:#171a21}
-    .btn.ghost{background:transparent;color:var(--brand);border:1px dashed var(--brand)}
-    .btn.small{padding:8px 10px;font-size:13px}
-    .btn:active{transform:scale(.98)} .actions{display:grid;gap:12px}
-    .ring{--s:66px;width:var(--s);height:var(--s);position:relative;margin:14px auto}
-    .ring i{position:absolute;inset:0;border-radius:50%;border:4px dotted var(--brand);animation:spin 1.8s linear infinite;filter:drop-shadow(0 0 6px rgba(246,217,234,.5))} @keyframes spin{to{transform:rotate(1turn)}}
-    .grid{display:grid;gap:12px}
-    .driver{display:grid;grid-template-columns:88px 1fr;gap:12px;align-items:center}
-    .thumb{width:88px;height:88px;border-radius:14px;overflow:hidden;border:1px solid #223;background:#0b0f16}
-    .thumb img{width:100%;height:100%;object-fit:cover}
-    .driver h3{font-size:18px}.sub{font-size:13px;color:var(--muted)}
-    .meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
-    .pill{font-size:12px;padding:6px 10px;border-radius:999px;background:#0f141d;border:1px solid #223}
-    .pill.ok{background:#0f2b22;color:#b6f4d6;border-color:#1d5a46}
-    .pill.no{background:#321e22;color:#ffc8cf;border-color:#7a2a35}
-    .like{margin-left:auto;font-size:20px;cursor:pointer;user-select:none}
-    .rating,.c-stars,.stars{display:flex;gap:2px;font-size:18px;user-select:none;align-items:center}
-    .rating span.on,.c-stars span.on,.stars span.on{color:var(--star-on)}
-    .rating span.off,.c-stars span.off,.stars span.off{color:var(--star-off)} .rating{cursor:pointer}
-    .profile-hero{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-    .profile-hero .ph{height:160px;border-radius:14px;overflow:hidden;border:1px solid #223;background:#0b0f16}
-    .profile-hero .ph img{width:100%;height:100%;object-fit:cover}
-    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 14px}
-    .stat{background:var(--panel-2);border:1px solid #223;border-radius:12px;padding:10px;text-align:center}
-    .label{font-size:11px;color:var(--muted)} .val{font-weight:800;font-size:16px}
-    .comments{margin-top:10px}.comment{background:var(--panel-2);border:1px solid #223;border-radius:12px;padding:10px;margin-top:8px}
-    .comment .c-text{font-size:14px} .input{width:100%;background:#0f141d;border:1px solid #223;color:var(--text);border-radius:12px;padding:12px;outline:none}
-    .field{display:grid;gap:6px;margin-bottom:12px} .fields.inline{grid-template-columns:1fr 1fr;gap:10px}
-    label{font-size:12px;color:var(--muted)}
-    table{width:100%;border-collapse:collapse;font-size:13px;overflow:hidden;border-radius:12px;border:1px solid #223;background:var(--panel)}
-    th,td{padding:10px;border-bottom:1px solid #223} th{text-align:left;color:var(--muted);font-weight:700} tr:last-child td{border-bottom:0}
-    .planner{background:var(--panel);border:1px solid #223;border-radius:16px;overflow:auto}
-    .planner .header,.planner .row{display:grid;grid-template-columns:80px repeat(7,1fr);min-width:720px}
-    .planner .header{background:#0e1420;border-bottom:1px solid #223}
-    .planner .cell,.planner .hcell{padding:10px;border-right:1px solid #223}
-    .planner .hcell{font-weight:700;color:var(--muted);text-align:center}
-    .time{color:var(--muted);font-size:12px;white-space:nowrap}
-    .slot{min-height:56px;border-right:1px solid #223;border-bottom:1px solid #223;position:relative;background:#0b0f16}
-    .event{position:absolute;inset:6px;background:#121827;border:1px solid #223;border-left:3px solid var(--brand);border-radius:10px;padding:6px 8px;display:flex;flex-direction:column;gap:2px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
-    .event .t{font-weight:800;font-size:12px}.event .s{font-size:11px;color:var(--muted)}
-    .topbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-    .back{background:transparent;border:1px solid #223;color:#fff;border-radius:10px;padding:8px 10px;font-weight:700}
-    video{width:100%;border-radius:16px;border:1px solid #223;display:block}
-    .map{position:relative;border-radius:16px;overflow:hidden;border:1px solid #223;background:#0b0f16}
-    .map img{display:block;width:100%;height:auto}
-    .carpin{position:absolute;width:42px;aspect-ratio:1;border-radius:50%;background:var(--brand);bottom:20%;left:48%;display:grid;place-items:center;font-weight:900;color:#111}
-    .muted{color:var(--muted)} .sp8{height:8px} .sp12{height:12px} .sp16{height:16px}
-    .right{margin-left:auto} #s-home .actions{justify-content:center} #s-home .logo{margin-bottom:16px}
-    .bottom-btn{position:fixed;left:20px;right:20px;bottom:20px;max-width:560px;margin:0 auto;display:block;text-align:center}
-    .pick .star{filter:drop-shadow(0 0 6px rgba(0,0,0,.3))} .pick .star.on{color:var(--star-on)} .pick .star.off{color:var(--star-off)}
-    .pick .star.zero{font-size:13px;margin-left:6px;padding:2px 8px;border:1px solid #223;border-radius:999px;color:#c2c8d3;cursor:pointer}
-    /* Ride screen */
-    #rideMap{height:360px;border-radius:14px;border:1px solid #223}
-    .row-actions{display:flex;gap:8px;flex-wrap:wrap}
+    body{
+      margin:0;
+      font-family:"Nunito Sans",system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif;
+      color:var(--text);
+      background: linear-gradient(180deg,var(--bg-bottom),var(--bg-top));
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    .app{min-height:100dvh; display:flex; align-items:center; justify-content:center;}
+    .screen{width:100%; max-width:560px; margin:auto; padding:20px; display:none;}
+    .center{display:flex; align-items:center; justify-content:center; text-align:center}
+
+    .card{
+      background:var(--panel);
+      border:1px solid #222a36;
+      border-radius:20px;
+      padding:18px;
+      box-shadow:0 10px 30px rgba(0,0,0,.35)
+    }
+
+    .logo{width:min(220px,60vw); height:auto; display:block; margin:0 auto 18px}
+    h1,h2,h3{margin:0 0 8px}
+    p{margin:6px 0 0; color:var(--muted)}
+
+    .btn{appearance:none; border:0; border-radius:14px; padding:14px 18px; font-weight:800; letter-spacing:.3px; cursor:pointer; transition:.2s transform ease, .2s filter ease;}
+    .btn.brand{background:var(--brand); color:#171a21}
+    .btn.ghost{background:transparent; color:var(--brand); border:1px dashed var(--brand)}
+    .btn:active{transform:scale(.98)}
+    .actions{display:grid; gap:12px}
+
+    .ring{--s:66px; width:var(--s); height:var(--s); position:relative; margin:14px auto}
+    .ring i{position:absolute; inset:0; border-radius:50%; border:4px dotted var(--brand); animation:spin 1.8s linear infinite; filter:drop-shadow(0 0 6px rgba(246,217,234,.5))}
+    @keyframes spin{to{transform:rotate(1turn)}}
+
+    .grid{display:grid; gap:12px}
+    .driver{display:grid; grid-template-columns:88px 1fr; gap:12px; align-items:center}
+    .thumb{width:88px; height:88px; border-radius:14px; overflow:hidden; border:1px solid #223; background:#0b0f16}
+    .thumb img{width:100%; height:100%; object-fit:cover}
+    .driver h3{font-size:18px}
+    .sub{font-size:13px; color:var(--muted)}
+    .meta{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:6px}
+    .pill{font-size:12px; padding:6px 10px; border-radius:999px; background:#0f141d; border:1px solid #223}
+    .pill.ok{background:#0f2b22; color:#b6f4d6; border-color:#1d5a46}
+    .pill.no{background:#321e22; color:#ffc8cf; border-color:#7a2a35}
+    .like{margin-left:auto; font-size:20px; cursor:pointer; user-select:none}
+
+    /* ÉTOILES (drivers + commentaires) */
+    .rating, .c-stars, .stars{display:flex; gap:2px; font-size:18px; user-select:none; align-items:center}
+    .rating span.on, .c-stars span.on, .stars span.on{color:var(--star-on)}
+    .rating span.off, .c-stars span.off, .stars span.off{color:var(--star-off)}
+    .rating{cursor:pointer}
+
+    .profile-hero{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px}
+    .profile-hero .ph{height:160px; border-radius:14px; overflow:hidden; border:1px solid #223; background:#0b0f16}
+    .profile-hero .ph img{width:100%; height:100%; object-fit:cover}
+
+    .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:10px 0 14px}
+    .stat{background:var(--panel-2); border:1px solid #223; border-radius:12px; padding:10px; text-align:center}
+    .label{font-size:11px; color:var(--muted)}
+    .val{font-weight:800; font-size:16px}
+
+    .comments{margin-top:10px}
+    .comment{background:var(--panel-2); border:1px solid #223; border-radius:12px; padding:10px; margin-top:8px}
+    .comment .c-text{font-size:14px}
+
+    .input{width:100%; background:#0f141d; border:1px solid #223; color:var(--text); border-radius:12px; padding:12px; outline:none}
+
+    .field{display:grid; gap:6px; margin-bottom:12px}
+    .fields.inline{grid-template-columns:1fr 1fr; gap:10px}
+    label{font-size:12px; color:var(--muted)}
+    table{width:100%; border-collapse:collapse; font-size:13px; overflow:hidden; border-radius:12px; border:1px solid #223; background:var(--panel)}
+    th,td{padding:10px; border-bottom:1px solid #223}
+    th{text-align:left; color:var(--muted); font-weight:700}
+    tr:last-child td{border-bottom:0}
+
+    /* PLANNER — fixes responsive + layout */
+    .planner{
+      background:var(--panel);
+      border:1px solid #223;
+      border-radius:16px;
+      overflow:auto;               /* scroll horizontal si trop étroit */
+    }
+    .planner .header,
+    .planner .row{
+      display:grid;
+      grid-template-columns:80px repeat(7,1fr);
+      min-width:720px;             /* évite l’écrasement des colonnes */
+    }
+    .planner .header{
+      background:#0e1420;
+      border-bottom:1px solid #223
+    }
+    .planner .cell,.planner .hcell{padding:10px; border-right:1px solid #223}
+    .planner .hcell{font-weight:700; color:var(--muted); text-align:center}
+    .time{color:var(--muted); font-size:12px; white-space:nowrap}
+    .slot{
+      min-height:56px;             /* lignes un peu plus hautes */
+      border-right:1px solid #223; border-bottom:1px solid #223;
+      position:relative; background:#0b0f16
+    }
+    .slot:last-child{border-right:0}
+    .event{
+      position:absolute; inset:6px;
+      background:#121827; border:1px solid #223;
+      border-left:3px solid var(--brand);
+      border-radius:10px; padding:6px 8px;
+      display:flex; flex-direction:column; gap:2px;
+      line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      pointer-events:none;          /* évite la sélection gênante */
+    }
+    .event .t{font-weight:800; font-size:12px}
+    .event .s{font-size:11px; color:var(--muted)}
+
+    .topbar{display:flex; align-items:center; gap:10px; margin-bottom:12px}
+    .back{background:transparent; border:1px solid #223; color:#fff; border-radius:10px; padding:8px 10px; font-weight:700}
+
+    video{width:100%; border-radius:16px; border:1px solid #223; display:block}
+
+    .map{position:relative; border-radius:16px; overflow:hidden; border:1px solid #223; background:#0b0f16}
+    .map img{display:block; width:100%; height:auto}
+    .carpin{position:absolute; width:42px; aspect-ratio:1; border-radius:50%; background:var(--brand); bottom:20%; left:48%; display:grid; place-items:center; font-weight:900; color:#111}
+
+    .muted{color:var(--muted)}
+    .sp8{height:8px}
+    .sp12{height:12px}
+    .sp16{height:16px}
+    .right{margin-left:auto}
+    #s-home .actions{justify-content:center}
+    #s-home .logo{margin-bottom:16px}
+    .bottom-btn{ position:fixed; left:20px; right:20px; bottom:20px; max-width:560px; margin:0 auto; display:block; text-align:center; }
+
+    /* Star picker (comment) */
+    .pick .star{filter:drop-shadow(0 0 6px rgba(0,0,0,.3))}
+    .pick .star.on{color:var(--star-on)}
+    .pick .star.off{color:var(--star-off)}
+    .pick .star.zero{font-size:13px; margin-left:6px; padding:2px 8px; border:1px solid #223; border-radius:999px; color:#c2c8d3; cursor:pointer;}
   </style>
 </head>
 <body>
@@ -114,7 +185,7 @@
       <button class="btn brand" onclick="go('s-home')">Continue</button>
     </section>
 
-    <!-- Screen 3: home -->
+    <!-- Screen 3: home (Book/Admin) -->
     <section id="s-home" class="screen center">
       <div>
         <img src="logo.png" alt="Campus Drivers" class="logo"/>
@@ -177,7 +248,7 @@
       </div>
     </section>
 
-    <!-- Screen 6: booking confirmation (simple) -->
+    <!-- Screen 6: fake navigation / confirmation -->
     <section id="s-confirm" class="screen">
       <div class="topbar"><button class="back" onclick="go('s-profile')">◀ Back</button><h3>Booking</h3></div>
       <div class="card">
@@ -194,9 +265,10 @@
     <section id="s-admin-login" class="screen">
       <div class="topbar"><button class="back" onclick="go('s-home')">◀ Back</button><h3>Admin login</h3></div>
       <div class="card">
-        <div class="field"><label>Username (first name)</label><input id="admUser" class="input" autocomplete="username" placeholder="Username"></div>
-        <div class="field"><label>Password (first name)</label><input id="admPass" class="input" type="password" autocomplete="current-password" placeholder="Password"></div>
+        <div class="field"><label>Username (first name)</label><input id="admUser" class="input" autocomplete="username" placeholder="e.g. Lane"></div>
+        <div class="field"><label>Password (last name)</label><input id="admPass" class="input" type="password" autocomplete="current-password" placeholder="e.g. O'Neill"></div>
         <button class="btn brand" onclick="adminLogin()">Enter Driver Profile</button>
+        <p class="muted" style="margin-top:8px">Tip: Lane / O'Neill • Donovan / Wentworth • Lewis / Prescott • Adam / Kingsley</p>
       </div>
     </section>
 
@@ -205,8 +277,6 @@
       <div class="topbar">
         <button class="back" onclick="go('s-admin-login')">◀ Logout</button>
         <h3 id="a-title">Driver Admin</h3>
-        <button class="btn brand" onclick="startRideByAdmin()">Start Ride</button>
-
         <button class="btn brand right" onclick="go('s-planner')">Planner</button>
       </div>
 
@@ -242,55 +312,68 @@
       <div class="topbar"><button class="back" onclick="go('s-admin')">◀ Back</button><h3>Weekly planning</h3></div>
       <div id="planner" class="planner"></div>
     </section>
-
-    <!-- Screen 10: live ride -->
-    <section id="s-ride" class="screen">
-      <div class="topbar">
-        <button class="back" onclick="go(backAfterRide||'s-book')">◀ Back</button>
-        <h3 id="rideTitle">Start Ride</h3>
-        <button class="btn brand right small" id="endRideBtn" onclick="endRide()" style="display:none">End Ride</button>
-      </div>
-
-      <div class="card">
-        <div class="fields inline">
-          <div class="field"><label>Pickup</label><input id="inPickup" class="input" placeholder="Use my location or type address"></div>
-          <div class="field"><label>Dropoff</label><input id="inDrop" class="input" placeholder="Destination address"></div>
-        </div>
-        <div class="row-actions">
-          <button class="btn small brand" onclick="useMyLocation()">Use my location</button>
-          <button class="btn small ghost" onclick="routeTo()">Set destination</button>
-          <button class="btn small" onclick="toggleFollow()"><span id="followTxt">Follow: ON</span></button>
-          <button class="btn small" onclick="clearRoute()">Clear</button>
-        </div>
-      </div>
-      <div class="sp12"></div>
-      <button class="btn brand block" onclick="beginRide()">Start Ride</button>
-<div class="sp12"></div>
-
-      <div id="rideMap"></div>
-      <div class="sp12"></div>
-      <div class="card"><div id="rideInfo" class="muted">Waiting for GPS…</div></div>
-    </section>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
   // -------- Data --------
   const drivers = [
-    { id:'lane', first:'Captain', last:"Lane", age:21, car:'CHEVROLET CAMARO CABRIOLET PACK SS V8 1967', engine:'6.5L V8 • 375 hp • Manual', photo:'lane-photo.jpg', carPhoto:'camaro.jpg', rating:4.8, rides:312, km:17840, likes:false, available:true, comments:[{text:"Smoothest ride in Belrose.",rating:5},{text:"Always early, always classy.",rating:5}] },
-    { id:'donovan', first:'Donovan', last:'Wolinski', age:21, car:'OLDSMOBILE 442 1970', engine:'7.5L V8 • 370 hp • Auto', photo:'donovan-photo.jpg', carPhoto:'oldsmobile.jpg', rating:4.6, rides:287, km:15210, likes:false, available:true, comments:[{text:"Soundtrack on point.",rating:4},{text:"Great with luggage even on crutches!",rating:5}] },
-    { id:'lewis', first:'Lewis', last:'Conley', age:21, car:'FORD MUSTANG CONVERTIBLE 1964', engine:'4.7L V8 • 271 hp • Manual', photo:'lewis-photo.jpg', carPhoto:'mustang.jpg', rating:4.7, rides:334, km:20110, likes:false, available:true, comments:[{text:"Party starter but safe driver.",rating:4},{text:"‘Driver talks too much’? Two stars? him??",rating:2}] },
-    { id:'adam', first:'Adam', last:'Wilson', age:21, car:'PONTIAC LEMANS 1968', engine:'5.3L V8 • 250 hp • Auto', photo:'adam-photo.jpg', carPhoto:'lemans.jpg', rating:4.5, rides:245, km:13150, likes:false, available:false, comments:[{text:"Chill vibes. Premium scent.",rating:5}] }
+    {
+      id:'lane', first:'Lane', last:"O'Neill", age:21,
+      car:'CHEVROLET CAMARO CABRIOLET PACK SS V8 1967',
+      engine:'6.5L V8 • 375 hp • Manual',
+      photo:'lane-photo.jpg',
+      carPhoto:'camaro.jpg',
+      rating:4.8, rides:312, km:17840, likes:false, available:true,
+      comments:[
+        { text:"Smoothest ride in Belrose.", rating:5 },
+        { text:"Always early, always classy.", rating:5 }
+      ]
+    },
+    {
+      id:'donovan', first:'Donovan', last:'Wentworth', age:21,
+      car:'OLDSMOBILE 442 1970',
+      engine:'7.5L V8 • 370 hp • Auto',
+      photo:'donovan-photo.jpg',
+      carPhoto:'oldsmobile.jpg',
+      rating:4.6, rides:287, km:15210, likes:false, available:true,
+      comments:[
+        { text:"Soundtrack on point.", rating:4 },
+        { text:"Great with luggage even on crutches!", rating:5 }
+      ]
+    },
+    {
+      id:'lewis', first:'Lewis', last:'Prescott', age:21,
+      car:'FORD MUSTANG CONVERTIBLE 1964',
+      engine:'4.7L V8 • 271 hp • Manual',
+      photo:'lewis-photo.jpg',
+      carPhoto:'mustang.jpg',
+      rating:4.7, rides:334, km:20110, likes:false, available:true,
+      comments:[
+        { text:"Party starter but safe driver.", rating:4 },
+        { text:"‘Driver talks too much’? Two stars? him??", rating:2 }
+      ]
+    },
+    {
+      id:'adam', first:'Adam', last:'Kingsley', age:21,
+      car:'PONTIAC LEMANS 1968',
+      engine:'5.3L V8 • 250 hp • Auto',
+      photo:'adam-photo.jpg',
+      carPhoto:'lemans.jpg',
+      rating:4.5, rides:245, km:13150, likes:false, available:false,
+      comments:[ { text:"Chill vibes. Premium scent.", rating:5 } ]
+    }
   ];
 
   const adminCtx = { current:null };
-  let backAfterRide = 's-book';
 
   // -------- Navigation --------
   const screens = Array.from(document.querySelectorAll('.screen'));
   function go(id){
     screens.forEach(s=>s.style.display = (s.id===id?'block':'none'));
-    if(id==='s-video'){ const v=document.getElementById('introVideo'); v.currentTime=0; v.play().catch(()=>{}); }
+    if(id==='s-video'){
+      const v=document.getElementById('introVideo');
+      v.currentTime = 0; v.play().catch(()=>{});
+    }
   }
 
   window.addEventListener('load',()=>{
@@ -317,91 +400,192 @@
             <div class="pill">${d.rides} rides</div>
             <div class="pill">${d.km.toLocaleString()} km</div>
             <div class="like" onclick="toggleLike(${i})">${d.likes?'❤️':'🤍'}</div>
-            <button class="btn small right" onclick="openProfile(${i})">Open profile</button>
+            <button class="btn brand right" onclick="openProfile(${i})">Open profile</button>
           </div>
         </div>`;
       wrap.appendChild(card);
     });
     wrap.querySelectorAll('.rating').forEach(el=>{
-      el.addEventListener('click',()=>{ setRating(+el.dataset.i); });
+      el.addEventListener('click',e=>{
+        const i = +el.dataset.i;
+        setRating(i);
+      });
     });
   }
 
-  function starsHTML(avg){ const full=Math.round(avg); let html=''; for(let i=1;i<=5;i++){ html+=`<span class="${i<=full?'on':'off'}">★</span>` } return html; }
-  function setRating(i){ const r = prompt('Set rating 1-5 for '+drivers[i].first, drivers[i].rating); if(!r) return; const val = Math.max(1,Math.min(5,parseFloat(r))); drivers[i].rating = val; renderDrivers(); if(adminCtx.current?.id===drivers[i].id) loadProfile(i); }
+  function starsHTML(avg){
+    const full = Math.round(avg);
+    let html='';
+    for(let i=1;i<=5;i++){
+      html += `<span class="${i<=full?'on':'off'}">★</span>`;
+    }
+    return html;
+  }
+
+  function setRating(i){
+    const r = prompt('Set rating 1-5 for '+drivers[i].first, drivers[i].rating);
+    if(!r) return;
+    const val = Math.max(1,Math.min(5,parseFloat(r)));
+    drivers[i].rating = val;
+    renderDrivers();
+    if(adminCtx.current?.id===drivers[i].id) loadProfile(i);
+  }
+
   function toggleLike(i){ drivers[i].likes = !drivers[i].likes; renderDrivers(); }
   function toggleAvail(i){ drivers[i].available = !drivers[i].available; renderDrivers(); }
 
   // -------- Profile --------
   let currentIndex = 0;
   function openProfile(i){ currentIndex = i; loadProfile(i); go('s-profile'); }
+
   function loadProfile(i){
     const d = drivers[i];
     setText('p-name', d.first + ' ' + d.last);
-    byId('p-photo').src = d.photo; byId('p-car').src = d.carPhoto;
-    setText('p-rides', d.rides); setText('p-rating', d.rating.toFixed(1)); setText('p-km', d.km.toLocaleString());
+    byId('p-photo').src = d.photo;
+    byId('p-car').src = d.carPhoto;
+    setText('p-rides', d.rides);
+    setText('p-rating', d.rating.toFixed(1));
+    setText('p-km', d.km.toLocaleString());
     setText('p-engine', d.engine);
     setText('p-quote', d.id==='lewis' ? "Lewis opens the app and scrolls through his latest reviews. ‘He gave me 2 stars? ‘Driver talks too much.’?’" : '');
-    const list = byId('commentsList'); list.innerHTML='';
-    (d.comments||[]).forEach(c=> list.appendChild(commentEl(typeof c==='string'?{text:c,rating:null}:c)) );
-    commentRating = 0; updateStarPicker();
-    byId('starPicker').querySelectorAll('.star').forEach(el=>{
-      el.onclick = ()=>{ commentRating = parseInt(el.dataset.v,10); updateStarPicker(); };
+
+    const list = byId('commentsList');
+    list.innerHTML='';
+    (d.comments||[]).forEach(c=>{
+      list.appendChild(commentEl(typeof c === 'string' ? {text:c, rating:null} : c));
+    });
+
+    commentRating = 0;
+    updateStarPicker();
+    const picker = byId('starPicker');
+    picker.querySelectorAll('.star').forEach(el=>{
+      el.onclick = () => {
+        commentRating = parseInt(el.dataset.v,10);
+        updateStarPicker();
+      };
     });
   }
-  function commentEl(c){ const div=document.createElement('div'); div.className='comment'; const stars=(c.rating==null)?'':starLine(c.rating); div.innerHTML = `${stars? `<div class="c-stars">${stars}</div>`:''}<div class="c-text">${escapeHTML(c.text)}</div>`; return div; }
-  function starLine(v){ let html=''; for(let i=1;i<=5;i++){ html+=`<span class="${i<=v?'on':'off'}">★</span>` } return html; }
-  let commentRating=0;
-  function updateStarPicker(){ const picker=byId('starPicker'), val=byId('starVal'); picker.querySelectorAll('[data-v]').forEach(el=>{ const v=+el.dataset.v; if(v===0) return; el.classList.remove('on','off'); el.classList.add(v<=commentRating?'on':'off'); }); val.textContent=(commentRating||0)+'/5'; }
-  function addComment(){ const el=byId('commentInput'); const t=el.value.trim(); if(!t && commentRating===0) return; const obj={text:t||'(no text)',rating:commentRating}; drivers[currentIndex].comments=drivers[currentIndex].comments||[]; drivers[currentIndex].comments.unshift(obj); el.value=''; commentRating=0; updateStarPicker(); loadProfile(currentIndex); }
-  function confirmBooking(){ const d=drivers[currentIndex]; setText('c-title', `Booked: ${d.first} ${d.last} • ${d.car}`); go('s-confirm'); }
+
+  function commentEl(c){
+    const div = document.createElement('div');
+    div.className='comment';
+    const stars = (c.rating==null) ? '' : starLine(c.rating);
+    div.innerHTML = `
+      ${stars? `<div class="c-stars">${stars}</div>`:''}
+      <div class="c-text">${escapeHTML(c.text)}</div>
+    `;
+    return div;
+  }
+
+  function starLine(v){
+    let html='';
+    for(let i=1;i<=5;i++){
+      html += `<span class="${i<=v?'on':'off'}">★</span>`;
+    }
+    return html;
+  }
+
+  let commentRating = 0;
+  function updateStarPicker(){
+    const picker = byId('starPicker');
+    const val = byId('starVal');
+    picker.querySelectorAll('[data-v]').forEach(el=>{
+      const v = +el.dataset.v;
+      if(v===0){ return; }
+      el.classList.remove('on','off');
+      el.classList.add(v<=commentRating ? 'on' : 'off');
+    });
+    val.textContent = (commentRating||0) + '/5';
+  }
+
+  function addComment(){
+    const el = byId('commentInput');
+    const t = el.value.trim();
+    if(!t && commentRating===0) return;
+    const obj = { text: t||'(no text)', rating: commentRating };
+    drivers[currentIndex].comments = drivers[currentIndex].comments || [];
+    drivers[currentIndex].comments.unshift(obj);
+    el.value=''; commentRating = 0; updateStarPicker(); loadProfile(currentIndex);
+  }
+
+  function confirmBooking(){
+    const d = drivers[currentIndex];
+    setText('c-title', `Booked: ${d.first} ${d.last} • ${d.car}`);
+    go('s-confirm');
+  }
 
   // -------- Admin --------
   function adminLogin(){
     const u = byId('admUser').value.trim().toLowerCase();
-    const p = byId('admPass').value.trim().toLowerCase();
-    const d = drivers.find(x=> x.first.toLowerCase()===u && x.first.toLowerCase()===p);
+    const pRaw = byId('admPass').value.trim().toLowerCase();
+    const norm = s=>s.replace(/[^a-z0-9]/g,'');
+    const d = drivers.find(x=> x.first.toLowerCase()===u && norm(x.last.toLowerCase())===norm(pRaw));
     if(!d){ alert('Invalid credentials'); return; }
     adminCtx.current = d; loadAdmin(d); go('s-admin');
   }
-  function startRideByAdmin(){
-  if(!adminCtx.current) return;
-  const i = drivers.findIndex(x => x.id === adminCtx.current.id);
-  if(i < 0) return;
-  backAfterRide = 's-admin';   // retour à l’admin en quittant la course
-  startRide(i);
-}
-function loadAdmin(d){
+
+  function loadAdmin(d){
     setText('a-title', d.first + ' ' + d.last);
-    byId('a-photo').src = d.photo; byId('a-car').src = d.carPhoto;
-    byId('a-car-name').value = d.car; byId('a-car-engine').value = d.engine;
-    const week=(d.rides*22).toFixed(0), month=(d.rides*88).toFixed(0), year=(d.rides*880).toFixed(0);
-    byId('a-ew').value='$'+Number(week).toLocaleString();
-    byId('a-em').value='$'+Number(month).toLocaleString();
-    byId('a-ey').value='$'+Number(year).toLocaleString();
-    const tb = byId('a-history').querySelector('tbody'); tb.innerHTML='';
-    const names=['Ava Carter','Maya Singh','Noah Brooks','Leo Turner','Sofia Nguyen','Emma Jones','Ethan Clark'];
-    const snips=['Perfect ride!','Clean car, good music.','Would book again.','Talks a lot but funny!','Fast pick-up.','Smooth driving.','Great energy.'];
-    for(let i=0;i<7;i++){ const tr=document.createElement('tr'); const rate=(Math.random()*1+4).toFixed(1); tr.innerHTML=`<td>${names[i]}</td><td>${rate}★</td><td>${snips[i]}</td>`; tb.appendChild(tr); }
+    byId('a-photo').src = d.photo;
+    byId('a-car').src = d.carPhoto;
+    byId('a-car-name').value = d.car;
+    byId('a-car-engine').value = d.engine;
+
+    const week = (d.rides*22).toFixed(0), month=(d.rides*88).toFixed(0), year=(d.rides*880).toFixed(0);
+    byId('a-ew').value = '$' + Number(week).toLocaleString();
+    byId('a-em').value = '$' + Number(month).toLocaleString();
+    byId('a-ey').value = '$' + Number(year).toLocaleString();
+
+    const tb = byId('a-history').querySelector('tbody');
+    tb.innerHTML='';
+    const names = ['Ava Carter','Maya Singh','Noah Brooks','Leo Turner','Sofia Nguyen','Emma Jones','Ethan Clark'];
+    const snips = ['Perfect ride!','Clean car, good music.','Would book again.','Talks a lot but funny!','Fast pick-up.','Smooth driving.','Great energy.'];
+    for(let i=0;i<7;i++){
+      const tr = document.createElement('tr');
+      const rate = (Math.random()*1+4).toFixed(1);
+      tr.innerHTML = `<td>${names[i]}</td><td>${rate}★</td><td>${snips[i]}</td>`;
+      tb.appendChild(tr);
+    }
     buildPlanner(d);
   }
 
   // -------- Planner --------
-  function buildPlanner(){
-    const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun']; const root=byId('planner'); root.innerHTML='';
-    const header=document.createElement('div'); header.className='header';
-    header.innerHTML='<div class="hcell">Time</div>'+days.map(x=>`<div class="hcell">${x}</div>`).join(''); root.appendChild(header);
-    const people=['Lois','Becca','Elena','Prudence','Thomas','Sam','Alex','Jordan','Taylor','Casey','Riley','Morgan','Jamie','Cameron','Drew'];
-    for(let h=8;h<=22;h++){
-      const row=document.createElement('div'); row.className='row';
-      const time=document.createElement('div'); time.className='cell time'; time.textContent=`${String(h).padStart(2,'0')}:00`; row.appendChild(time);
+  function buildPlanner(d){
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const root = byId('planner');
+    root.innerHTML='';
+
+    // header
+    const header = document.createElement('div');
+    header.className='header';
+    header.innerHTML = '<div class="hcell">Time</div>' + days.map(x=>`<div class="hcell">${x}</div>`).join('');
+    root.appendChild(header);
+
+    // Noms SANS "Max"
+    const people = ['Lois','Becca','Elena','Prudence','Hope'];
+
+    // rows (08:00 -> 22:00)
+    for(let h=8; h<=22; h++){
+      const row = document.createElement('div');
+      row.className='row';
+
+      const time = document.createElement('div');
+      time.className='cell time';
+      time.textContent = `${String(h).padStart(2,'0')}:00`;
+      row.appendChild(time);
+
       for(let dI=0; dI<7; dI++){
-        const slot=document.createElement('div'); slot.className='slot';
-        if(Math.random()<0.18){ const e=document.createElement('div'); e.className='event';
-          const kind=['Ride','Pickup','Airport','VIP'][Math.floor(Math.random()*4)];
-          const who=people[Math.floor(Math.random()*people.length)];
-          const mm=['00','15','30','45'][Math.floor(Math.random()*4)];
-          e.innerHTML=`<div class="t">${kind}</div><div class="s">${who} • ${String(h).padStart(2,'0')}:${mm}</div>`;
+        const slot = document.createElement('div');
+        slot.className='slot';
+
+        // une chance raisonnable d’évènement
+        if(Math.random()<0.18){
+          const e = document.createElement('div');
+          e.className='event';
+          const kind = ['Ride','Pickup','Airport','VIP'][Math.floor(Math.random()*4)];
+          const who  = people[Math.floor(Math.random()*people.length)];
+          const mm   = ['00','15','30','45'][Math.floor(Math.random()*4)];
+          e.innerHTML = `<div class="t">${kind}</div><div class="s">${who} • ${String(h).padStart(2,'0')}:${mm}</div>`;
           slot.appendChild(e);
         }
         row.appendChild(slot);
@@ -410,131 +594,10 @@ function loadAdmin(d){
     }
   }
 
-  // -------- Live Ride (Leaflet + GPS + Geocode + Route) --------
-  function beginRide(){
-  byId('endRideBtn').style.display='inline-block';
-  useMyLocation();   // lance le suivi GPS
-  // si une destination est déjà saisie, recalcule l’itinéraire
-  const d = byId('inDrop').value.trim();
-  if(d) routeTo();
-}
-
-  let ride = { driver:null, map:null, meMarker:null, destMarker:null, routeLine:null, follow:true, watchId:null };
-  function startRide(i){
-    ride.driver = drivers[i];
-    byId('rideTitle').textContent = `Start Ride • ${ride.driver.first} ${ride.driver.last}`;
-    backAfterRide = 's-book';
-    go('s-ride');
-    initMap();
-    byId('endRideBtn').style.display='inline-block';
-    useMyLocation(); // tente GPS direct
-  }
-  function endRide(){
-    if(ride.watchId) { navigator.geolocation.clearWatch(ride.watchId); ride.watchId=null; }
-    clearRoute();
-    byId('rideInfo').textContent='Ride ended.';
-  }
-  function initMap(){
-    if(ride.map) return;
-    ride.map = L.map('rideMap');
-L.tileLayer(
-  'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-  { maxZoom: 19, subdomains: 'abcd', attribution: '© OpenStreetMap, © CARTO',
-    className: 'mapTint' }          // <-- pour appliquer la teinte
-).addTo(ride.map);
-    ride.map.setView([43.7,7.26], 12); // Nice par défaut
-  }
-  function useMyLocation(){
-    if(!navigator.geolocation){ byId('rideInfo').textContent='Geolocation not supported.'; return; }
-    if(ride.watchId) navigator.geolocation.clearWatch(ride.watchId);
-    ride.watchId = navigator.geolocation.watchPosition(pos=>{
-      const {latitude:lat, longitude:lng, accuracy} = pos.coords;
-if(!ride.meMarker){
-  ride.meMarker = L.marker([lat,lng], {title:'You'}).addTo(ride.map);
-} else { ride.meMarker.setLatLng([lat,lng]); }
-
-      if(ride.follow) ride.map.setView([lat,lng], Math.max(ride.map.getZoom(), 15));
-      byId('rideInfo').textContent = `GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)} • ±${Math.round(accuracy)} m`;
-      // si pickup vide, on remplit une fois
-      const p = byId('inPickup'); if(!p.dataset.filled){ p.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`; p.dataset.filled = '1'; }
-    }, err=>{
-      byId('rideInfo').textContent = 'GPS error: '+err.message;
-    }, {enableHighAccuracy:true, maximumAge:2000, timeout:10000});
-  }
-  function toggleFollow(){ ride.follow = !ride.follow; byId('followTxt').textContent = 'Follow: '+(ride.follow?'ON':'OFF'); }
-  async function routeTo(){
-    const dest = byId('inDrop').value.trim();
-    if(!dest){ alert('Enter a destination'); return; }
-    const destCoords = await geocode(dest);
-    if(!destCoords){ alert('Destination not found'); return; }
-const destStyle = { radius:8, color:'#ffd76a', fillColor:'#ffd76a', fillOpacity:0.95, weight:2 };
-if(!ride.destMarker) ride.destMarker = L.circleMarker(destCoords, destStyle).addTo(ride.map);
-else ride.destMarker.setLatLng(destCoords);
-    const origin = ride.meMarker ? ride.meMarker.getLatLng() : ride.map.getCenter();
-    drawRoute(origin, destCoords);
-  }
-
-  async function geocode(q){
-    try{
-      const url = 'https://nominatim.openstreetmap.org/search?format=json&q='+encodeURIComponent(q);
-      const res = await fetch(url, {headers:{'Accept-Language':'en'}});
-      const data = await res.json();
-      if(!data[0]) return null;
-      return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-    }catch(e){ return null; }
-  }
-  async function drawRoute(a, b){
-    try{
-      const url = `https://router.project-osrm.org/route/v1/driving/${a.lng},${a.lat};${b[1]},${b[0]}?overview=full&geometries=geojson`;
-      const res = await fetch(url); const data = await res.json();
-      const coords = data.routes?.[0]?.geometry?.coordinates || [];
-      if(coords.length){
-        const latlngs = coords.map(([lon,lat])=>[lat,lon]);
-        if(ride.routeLine) ride.routeLine.setLatLngs(latlngs);
-else ride.routeLine = L.polyline(latlngs, {color:'#f6d9ea', weight:4, opacity:0.9}).addTo(ride.map);
-        ride.map.fitBounds(L.latLngBounds(latlngs), {padding:[20,20]});
-        byId('rideInfo').textContent = `Route distance: ${(data.routes[0].distance/1000).toFixed(1)} km • ETA ~ ${(data.routes[0].duration/60|0)} min`;
-      }
-    }catch(e){
-      byId('rideInfo').textContent = 'Route unavailable.';
-    }
-  }
-  function clearRoute(){
-    if(ride.routeLine){ ride.map.removeLayer(ride.routeLine); ride.routeLine=null; }
-    if(ride.destMarker){ ride.map.removeLayer(ride.destMarker); ride.destMarker=null; }
-  }
-
   // -------- Utils --------
   function byId(id){ return document.getElementById(id); }
   function setText(id,t){ byId(id).textContent=t; }
-  function escapeHTML(s){ return (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
-  if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .catch(console.error);
-  });
-}
-
-
+  function escapeHTML(s){ return (s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
   </script>
-  <button id="installBtn" class="btn brand" style="display:none;position:fixed;bottom:84px;left:20px;right:20px;max-width:560px;margin:0 auto;">Install App</button>
-<script>
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  const btn = document.getElementById('installBtn');
-  btn.style.display = 'block';
-  btn.onclick = async () => {
-    btn.style.display = 'none';
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    console.log('Install choice:', outcome);
-  };
-});
-</script>
-
 </body>
 </html>
