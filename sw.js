@@ -1,3 +1,4 @@
+const SW_VERSION = 'v2025-10-15-1'; // change à chaque déploiement
 const CACHE = 'campus-drivers-v2';
 const OFFLINE_URL = '/offline.html';
 const PRECACHE = [
@@ -51,4 +52,5 @@ self.addEventListener('fetch', (e) => {
     );
   }
 });
+
 
